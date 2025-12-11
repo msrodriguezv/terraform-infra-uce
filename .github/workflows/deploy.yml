@@ -1,0 +1,39 @@
+name: Deploy Hello World App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  despliegue:
+    name: "Desplegar Infraestructura"
+    runs-on: ubuntu-latest
+    
+    # Estas variables toman los valores de tus Secretos de GitHub
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: 'us-east-1'
+      TF_VAR_public_key_content: ${{ secrets.TF_VAR_PUBLIC_KEY_CONTENT }}
+
+    steps:
+      # 1. Descargar tu código
+      - name: Checkout Código
+        uses: actions/checkout@v3
+
+      # 2. El "Hola Mundo" simple que pediste (Para verificar el pipeline)
+      - name: Imprimir Saludo
+        run: echo "¡HOLA MUNDO! El pipeline de GitHub Actions está funcionando."
+
+      # 3. Instalar Terraform en la máquina virtual de GitHub
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      # 4. Inicializar Terraform
+      - name: Terraform Init
+        run: terraform init
+
+      # 5. Aplicar la infraestructura (Esto crea el ALB, ASG y Docker)
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
