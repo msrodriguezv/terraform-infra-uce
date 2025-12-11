@@ -211,3 +211,5 @@ output "command_to_see_ips" {
   description = " "
   value       = "aws ec2 describe-instances --filters \"Name=tag:Name,Values=${var.server_name}\" \"Name=instance-state-name,Values=running\" --query \"Reservations[*].Instances[*].{ID:InstanceId,PublicIP:PublicIpAddress}\" --output table"
 }
+
+# Activando GitHub Actions
