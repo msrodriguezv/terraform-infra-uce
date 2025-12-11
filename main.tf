@@ -212,4 +212,30 @@ output "command_to_see_ips" {
   value       = "aws ec2 describe-instances --filters \"Name=tag:Name,Values=${var.server_name}\" \"Name=instance-state-name,Values=running\" --query \"Reservations[*].Instances[*].{ID:InstanceId,PublicIP:PublicIpAddress}\" --output table"
 }
 
-# Activando GitHub Actions
+####### OUTPUTS - INFORMACIÓN ÚTIL #######
+
+# 1. URL DEL BALANCEADOR (Tu punto de entrada)
+output "url_balanceador" {
+  description = "Copia y pega esto en el navegador para ver tu web"
+  value       = "http://${aws_lb.app_alb.dns_name}"
+}
+
+# 2. COMANDO MÁGICO PARA VER IPs (Dinámico)
+# Como el ASG crea instancias automáticamente, este output te genera
+# el comando exacto para que lo pegues en tu terminal y veas las IPs reales.
+output "ver_ips_instancias" {
+  description = "Copia y ejecuta este comando en tu terminal para listar las IPs"
+  value       = "aws ec2 describe-instances --filters \"Name=tag:aws:autoscaling:groupName,Values=${aws_autoscaling_group.app_asg.name}\" \"Name=instance-state-name,Values=running\" --query \"Reservations[*].Instances[*].{ID:InstanceId,IP_Publica:PublicIpAddress,Estado:State.Name}\" --output table"
+}
+
+# 3. GRUPO DE SEGURIDAD (ID)
+output "id_grupo_seguridad" {
+  description = "El ID del Security Group aplicado a las instancias"
+  value       = aws_security_group.instance_sg.id
+}
+
+# 4. LLAVE SSH
+output "nombre_llave_ssh" {
+  description = "El nombre de la llave configurada en AWS"
+  value       = aws_key_pair.deployer.key_name
+}
