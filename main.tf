@@ -9,7 +9,7 @@ variable "instance_type" {
 }
 
 variable "server_name" {
-  default = "nginx-docker-cluster"
+  default = "nginx-docker-recox"
 }
 
 # Esta variable se llena automáticamente si configuraste el Secreto en GitHub
