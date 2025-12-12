@@ -57,3 +57,10 @@ jobs:
 
       - name: Mostrar URL del Balanceador
         if: success()
+        run: |
+          echo "---------------------------------------------"
+          echo "🚀 DESPLIEGUE FINALIZADO CON ÉXITO"
+          echo "🔗 URL DE TU APLICACIÓN:"
+          terraform output -raw url_balanceador
+          echo ""
+          echo "---------------------------------------------"
