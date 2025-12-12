@@ -1,50 +1,13 @@
-name: "Despliegue Infraestructura UCE"
+# ... (tus pasos anteriores de init y plan) ...
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
+      - name: Terraform Apply
+        id: apply
+        # El -auto-approve es necesario para que no pida confirmación manual en la nube
+        run: terraform apply -auto-approve
 
-jobs:
-  terraform:
-    name: "Terraform"
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout del código
-        uses: actions/checkout@v3
-
-      - name: Instalar Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.5.0
-
-      - name: Terraform Init
-        id: init
-        run: terraform init
-        env:
-          # Usamos secretos de GitHub para conectar con AWS
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-          AWS_DEFAULT_REGION: "us-east-1"
-
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate
-
-      - name: Terraform Plan
-        id: plan
-        # Generamos el plan pasando la llave pública como variable de entorno (si la guardas en secretos)
-        # Ojo: Para labs rápidos, a veces se omite la variable si no tienes la llave en secretos.
-        run: terraform plan -no-color
-        continue-on-error: true
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-          AWS_DEFAULT_REGION: "us-east-1"
-          # Aquí truco: Pasamos una llave "dummy" solo para que el plan no falle, 
-          # ya que en GitHub no tienes tu llave privada local.
-          TF_VAR_public_key_content: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC..."
+      - name: Mostrar URL del Balanceador
+        run: |
+          echo "---------------------------------------------"
+          echo "ACCEDE A TU APLICACIÓN AQUÍ:"
+          terraform output url_balanceador
+          echo "---------------------------------------------"
