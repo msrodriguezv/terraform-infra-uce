@@ -42,27 +42,10 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           AWS_DEFAULT_REGION: "us-east-1"
-          # OJO: Asegúrate de que esta línea tenga tu llave PÚBLICA completa, no cortada con puntos suspensivos
-          TF_VAR_public_key_content: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC..." 
-
-      # --- AQUÍ EMPIEZA LO NUEVO QUE NECESITABAS ---
+          TF_VAR_public_key_content: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCwGnhDv/rUTa7C81xOMRAUZThynxdPNrV98N2ocvW7YgLnRIuKzhyM9ITy+VwRegHcX2u2wythbm9pRpXSLvGvj8C0Dtm2mRLT2H0k75aUJGAwygdDS/n492c6VSfgXNgcOXHf3BWMhC5gY2gXqfXgOTYnHpzsI9jW+Pqj2EHirs0UGZ3bUEQWWGD9jJJQRgn/gjErmifV0Q48jFV1AsZAesqsz3VHFmo2gNLknjFONRuu1ST1RhDy+NzShRb06BqYS2WnVScNwPiCkw3Dnr/pTv+gaxN2UivITWEE2W3i+Jzyfxh45SJCDrucz34YH/S73A8tVHTWfOo+60RadDIhSc0TzqNirLjeT+rq6Zn2F9KdFUmolSiDjg0ClwSivYTg+y/sqTiN1/L90ow2fkcO2Rm2AENT4QaDu+QiD+vrMzKl9CGpC6gu0nOb/ptN/NM8Q45beElgkOaPUD5+sUkOmuTWlsTBp+Y80y+kNY/o0r7cbFR9XH20jPwVU4+YIWM= dgtcom@DgTcOm"
 
       - name: Terraform Apply
         id: apply
-        # El -auto-approve es vital para que no se quede esperando un "yes" manual
-        run: terraform apply -auto-approve
-        env:
-          # Es necesario REPETIR las credenciales aquí porque es un paso nuevo
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-          AWS_DEFAULT_REGION: "us-east-1"
-          # Usa la misma llave que pusiste arriba
-          TF_VAR_public_key_content: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCwGnhDv/rUTa7C81xOMRAUZThynxdPNrV98N2ocvW7YgLnRIuKzhyM9ITy+VwRegHcX2u2wythbm9pRpXSLvGvj8C0Dtm2mRLT2H0k75aUJGAwygdDS/n492c6VSfgXNgcOXHf3BWMhC5gY2gXqfXgOTYnHpzsI9jW+Pqj2EHirs0UGZ3bUEQWWGD9jJJQRgn/gjErmifV0Q48jFV1AsZAesqsz3VHFmo2gNLknjFONRuu1ST1RhDy+NzShRb06BqYS2WnVScNwPiCkw3Dnr/pTv+gaxN2UivITWEE2W3i+Jzyfxh45SJCDrucz34YH/S73A8tVHTWfOo+60RadDIhSc0TzqNirLjeT+rq6Zn2F9KdFUmolSiDjg0ClwSivYTg+y/sqTiN1/L90ow2fkcO2Rm2AENT4QaDu+QiD+vrMzKl9CGpC6gu0nOb/ptN/NM8Q45beElgkOaPUD5+sUkOmuTWlsTBp+Y80y+kNY/o0r7cbFR9XH20jPwVU4+YIWM= dgtcom@DgTcOm
-" 
-
-
-          - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve
         env:
@@ -70,12 +53,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           AWS_DEFAULT_REGION: "us-east-1"
-          # IMPORTANTE: Aquí debes poner tu llave pública REAL, no la variable vacía
-          TF_VAR_public_key_content: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC..." 
+          TF_VAR_public_key_content: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCwGnhDv/rUTa7C81xOMRAUZThynxdPNrV98N2ocvW7YgLnRIuKzhyM9ITy+VwRegHcX2u2wythbm9pRpXSLvGvj8C0Dtm2mRLT2H0k75aUJGAwygdDS/n492c6VSfgXNgcOXHf3BWMhC5gY2gXqfXgOTYnHpzsI9jW+Pqj2EHirs0UGZ3bUEQWWGD9jJJQRgn/gjErmifV0Q48jFV1AsZAesqsz3VHFmo2gNLknjFONRuu1ST1RhDy+NzShRb06BqYS2WnVScNwPiCkw3Dnr/pTv+gaxN2UivITWEE2W3i+Jzyfxh45SJCDrucz34YH/S73A8tVHTWfOo+60RadDIhSc0TzqNirLjeT+rq6Zn2F9KdFUmolSiDjg0ClwSivYTg+y/sqTiN1/L90ow2fkcO2Rm2AENT4QaDu+QiD+vrMzKl9CGpC6gu0nOb/ptN/NM8Q45beElgkOaPUD5+sUkOmuTWlsTBp+Y80y+kNY/o0r7cbFR9XH20jPwVU4+YIWM= dgtcom@DgTcOm"
 
       - name: Mostrar URL del Balanceador
-        run: |
-          echo "---------------------------------------------"
-          echo "🌐 URL DE TU APLICACIÓN:"
-          terraform output -raw url_balanceador
-          echo "---------------------------------------------"
+        if: success()
