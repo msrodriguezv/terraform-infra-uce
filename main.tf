@@ -8,9 +8,9 @@ variable "instance_type" {
   default = "t3.micro"
 }
 
-# HE CAMBIADO ESTO: Al cambiar el nombre base, casi todo se arregla solo.
+# CAMBIO CRÍTICO: Pasamos a v4 para evitar conflictos con lo que ya existe en AWS
 variable "server_name" {
-  default = "uce-lab-final-v3" 
+  default = "uce-lab-final-v4" 
 }
 
 variable "public_key_content" {
@@ -42,6 +42,7 @@ data "aws_subnets" "default" {
 
 ####### SECURITY GROUPS #######
 resource "aws_security_group" "alb_sg" {
+  # Tomará el nombre uce-lab-final-v4-alb-sg
   name        = "${var.server_name}-alb-sg"
   description = "Permitir HTTP al Balanceador"
   vpc_id      = data.aws_vpc.default.id
@@ -62,8 +63,8 @@ resource "aws_security_group" "alb_sg" {
 }
 
 resource "aws_security_group" "instance_sg" {
-  # ESTE ERA EL PROBLEMA PRINCIPAL: Le puse un nombre único nuevo.
-  name        = "uce-lab-instance-sg-final-v3"  
+  # CORREGIDO: Ahora usa la variable. Se llamará uce-lab-final-v4-instance-sg
+  name        = "${var.server_name}-instance-sg"  
   description = "Security group for instances"
   vpc_id      = data.aws_vpc.default.id
 
@@ -75,10 +76,10 @@ resource "aws_security_group" "instance_sg" {
   }
 
   ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id]
+    from_port        = 80
+    to_port          = 80
+    protocol         = "tcp"
+    security_groups  = [aws_security_group.alb_sg.id]
   }
 
   egress {
@@ -91,7 +92,7 @@ resource "aws_security_group" "instance_sg" {
 
 ####### KEY PAIR #######
 resource "aws_key_pair" "deployer" {
-  # Se actualiza con la variable server_name
+  # Se llamará uce-lab-final-v4-key
   key_name   = "${var.server_name}-key"
   public_key = var.public_key_content
 }
@@ -126,7 +127,7 @@ resource "aws_launch_template" "app_lt" {
 
 ####### LOAD BALANCER (ALB) #######
 resource "aws_lb" "app_alb" {
-  # ESTE CAMBIARÁ AUTOMÁTICAMENTE GRACIAS A LA VARIABLE server_name
+  # Se llamará uce-lab-final-v4-alb
   name               = "${var.server_name}-alb"
   internal           = false
   load_balancer_type = "application"
@@ -135,7 +136,7 @@ resource "aws_lb" "app_alb" {
 }
 
 resource "aws_lb_target_group" "app_tg" {
-  # ESTE TAMBIÉN CAMBIARÁ AUTOMÁTICAMENTE
+  # Se llamará uce-lab-final-v4-tg
   name     = "${var.server_name}-tg"
   port     = 80
   protocol = "HTTP"
