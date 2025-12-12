@@ -61,8 +61,10 @@ resource "aws_security_group" "alb_sg" {
 }
 
 resource "aws_security_group" "instance_sg" {
-  name        = "${var.server_name}-instance-sg"
-  description = "Permitir trafico desde el ALB y SSH"
+  name        = "uce-lab-Correx-instance-sg-v2"  # <--- CAMBIA ESTO
+  description = "Security group for instances"
+  # ... resto del código ...
+
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
