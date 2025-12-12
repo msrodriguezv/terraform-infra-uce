@@ -1,15 +1,16 @@
 ####### VARIABLES #######
 variable "ami_id" {
   description = "ID de la AMI (Amazon Linux 2023)"
-  default     = "ami-0440d3b780d96b29d" # Verifica si necesitas actualizar esto para us-east-1
+  default     = "ami-0440d3b780d96b29d" 
 }
 
 variable "instance_type" {
   default = "t3.micro"
 }
 
+# HE CAMBIADO ESTO: Al cambiar el nombre base, casi todo se arregla solo.
 variable "server_name" {
-  default = "uce-lab-Correx" # Cambié el nombre para evitar conflictos con lo anterior
+  default = "uce-lab-final-v3" 
 }
 
 variable "public_key_content" {
@@ -32,7 +33,7 @@ data "aws_subnets" "default" {
     name   = "vpc-id"
     values = [data.aws_vpc.default.id]
   }
-  # Filtramos zonas para asegurar alta disponibilidad sin errores
+  # Filtramos zonas para asegurar alta disponibilidad
   filter {
     name   = "availability-zone"
     values = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1f"]
@@ -41,7 +42,7 @@ data "aws_subnets" "default" {
 
 ####### SECURITY GROUPS #######
 resource "aws_security_group" "alb_sg" {
-  name        = "${var.server_name}-alb-sg_2"
+  name        = "${var.server_name}-alb-sg"
   description = "Permitir HTTP al Balanceador"
   vpc_id      = data.aws_vpc.default.id
 
@@ -61,10 +62,9 @@ resource "aws_security_group" "alb_sg" {
 }
 
 resource "aws_security_group" "instance_sg" {
-  name        = "uce-lab-Correx-instance-sg-v2"  # <--- CAMBIA ESTO
+  # ESTE ERA EL PROBLEMA PRINCIPAL: Le puse un nombre único nuevo.
+  name        = "uce-lab-instance-sg-final-v3"  
   description = "Security group for instances"
-  # ... resto del código ...
-
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
@@ -91,31 +91,30 @@ resource "aws_security_group" "instance_sg" {
 
 ####### KEY PAIR #######
 resource "aws_key_pair" "deployer" {
-  key_name   = "${var.server_name}-key_2"
+  # Se actualiza con la variable server_name
+  key_name   = "${var.server_name}-key"
   public_key = var.public_key_content
 }
 
 ####### LAUNCH TEMPLATE  #######
 resource "aws_launch_template" "app_lt" {
-  name_prefix   = "${var.server_name}-lt_2"
+  name_prefix   = "${var.server_name}-lt"
   image_id      = var.ami_id
   instance_type = var.instance_type
   key_name      = aws_key_pair.deployer.key_name
 
   vpc_security_group_ids = [aws_security_group.instance_sg.id]
 
-# Script corregido y limpio
   user_data = base64encode(<<-EOF
               #!/bin/bash
               yum update -y
               yum install -y docker
               service docker start
               usermod -a -G docker ec2-user
-
-              # Descargamos tu imagen pública y corremos el contenedor
               docker run -d -p 80:80 --restart always --name web-uce msrodriguezv/uce-app:v1
               EOF
   )
+  
   tag_specifications {
     resource_type = "instance"
     tags = {
@@ -127,6 +126,7 @@ resource "aws_launch_template" "app_lt" {
 
 ####### LOAD BALANCER (ALB) #######
 resource "aws_lb" "app_alb" {
+  # ESTE CAMBIARÁ AUTOMÁTICAMENTE GRACIAS A LA VARIABLE server_name
   name               = "${var.server_name}-alb"
   internal           = false
   load_balancer_type = "application"
@@ -135,11 +135,12 @@ resource "aws_lb" "app_alb" {
 }
 
 resource "aws_lb_target_group" "app_tg" {
+  # ESTE TAMBIÉN CAMBIARÁ AUTOMÁTICAMENTE
   name     = "${var.server_name}-tg"
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.default.id
-   
+    
   health_check {
     path    = "/"
     matcher = "200"
@@ -193,7 +194,7 @@ resource "aws_cloudwatch_metric_alarm" "high_network_in" {
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.app_asg.name
   }
-  alarm_actions     = [aws_autoscaling_policy.scale_up_net.arn]
+  alarm_actions       = [aws_autoscaling_policy.scale_up_net.arn]
 }
 
 ####### OUTPUTS #######
