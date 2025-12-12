@@ -41,7 +41,7 @@ data "aws_subnets" "default" {
 
 ####### SECURITY GROUPS #######
 resource "aws_security_group" "alb_sg" {
-  name        = "${var.server_name}-alb-sg"
+  name        = "${var.server_name}-alb-sg_2"
   description = "Permitir HTTP al Balanceador"
   vpc_id      = data.aws_vpc.default.id
 
@@ -89,13 +89,13 @@ resource "aws_security_group" "instance_sg" {
 
 ####### KEY PAIR #######
 resource "aws_key_pair" "deployer" {
-  key_name   = "${var.server_name}-key"
+  key_name   = "${var.server_name}-key_2"
   public_key = var.public_key_content
 }
 
 ####### LAUNCH TEMPLATE  #######
 resource "aws_launch_template" "app_lt" {
-  name_prefix   = "${var.server_name}-lt"
+  name_prefix   = "${var.server_name}-lt_2"
   image_id      = var.ami_id
   instance_type = var.instance_type
   key_name      = aws_key_pair.deployer.key_name
