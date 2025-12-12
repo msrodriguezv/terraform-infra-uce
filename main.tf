@@ -9,7 +9,7 @@ variable "instance_type" {
 }
 
 variable "server_name" {
-  default = "uce-lab-final" # Cambié el nombre para evitar conflictos con lo anterior
+  default = "uce-lab-Correx" # Cambié el nombre para evitar conflictos con lo anterior
 }
 
 variable "public_key_content" {
@@ -93,7 +93,7 @@ resource "aws_key_pair" "deployer" {
   public_key = var.public_key_content
 }
 
-####### LAUNCH TEMPLATE (CON TU WEB LINDA) #######
+####### LAUNCH TEMPLATE  #######
 resource "aws_launch_template" "app_lt" {
   name_prefix   = "${var.server_name}-lt"
   image_id      = var.ami_id
@@ -102,45 +102,18 @@ resource "aws_launch_template" "app_lt" {
 
   vpc_security_group_ids = [aws_security_group.instance_sg.id]
 
-  # Script para la página web bonita
+# Script corregido y limpio
   user_data = base64encode(<<-EOF
               #!/bin/bash
               yum update -y
               yum install -y docker
               service docker start
               usermod -a -G docker ec2-user
-              
-              # Crear carpeta web
-              mkdir -p /var/www/html
 
-              # Crear index.html bonito
-              cat <<HTML > /var/www/html/index.html
-              <!DOCTYPE html>
-              <html lang="es">
-              <head>
-                  <meta charset="UTF-8">
-                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                  <title>¡Hola Mundo UCE!</title>
-                  <style>
-                      body { font-family: sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-                      .container { text-align: center; background: rgba(255,255,255,0.1); padding: 3rem; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
-                      h1 { font-size: 3rem; margin-bottom: 0.5rem; }
-                  </style>
-              </head>
-              <body>
-                  <div class="container">
-                      <h1>🚀 ¡Hola Mundo!</h1>
-                      <p>Infraestructura desplegada con Terraform desde GitHub Actions.</p>
-                  </div>
-              </body>
-              </html>
-              HTML
-
-              # Arrancar Nginx montando el HTML
-              docker run -d -p 80:80 -v /var/www/html:/usr/share/nginx/html --name mi-web-linda nginx:alpine
+              # Descargamos tu imagen pública y corremos el contenedor
+              docker run -d -p 80:80 --restart always --name web-uce msrodriguezv/uce-app:v1
               EOF
   )
-
   tag_specifications {
     resource_type = "instance"
     tags = {

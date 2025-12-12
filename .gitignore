@@ -1,11 +1,13 @@
-# Archivos de Terraform
+# Terraform
 .terraform/
-.terraform.lock.hcl
 *.tfstate
-*.tfstate.*
-crash.log
+*.tfstate.backup
+*.tfvars
 
-# Llaves Privadas (¡CRÍTICO!)
-mi-llave-uce
+# Llaves SSH y Credenciales (¡NUNCA SUBIR ESTO!)
 *.pem
 *.key
+*.pub
+mi-llave-uce
+mi-llave-uce.pub
+id_rsa
